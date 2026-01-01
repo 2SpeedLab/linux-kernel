@@ -4,12 +4,11 @@
 
 | Network card | CPU | RAM |
 |--------------|-----|-----|
-| 40GB/s | 4 vcores (2294.686Mhz) | 8GB |
+| 40Gbps | 4 vcores (2294.686Mhz) | 8GB |
 
 ## All register
 
 ```
-
 net.core.somaxconn: "65535"
 net.ipv4.tcp_max_syn_backlog: "65535"
 
@@ -33,36 +32,28 @@ net.ipv4.tcp_syncookies: "1"
 net.ipv4.tcp_timestamps: "1"
 net.ipv4.tcp_sack: "1"
 net.ipv4.tcp_window_scaling: "1"
+net.ipv4.ip_local_port_range: "1024 65535"
 net.ipv4.ip_forward: "1"
+
 net.bridge.bridge-nf-call-iptables: "1"
 net.bridge.bridge-nf-call-ip6tables: "1"
+
 net.ipv6.conf.all.forwarding: "1"
 net.netfilter.nf_conntrack_max: "1048576"
+
 fs.file-max: "2097152"
 fs.nr_open: "2097152"
 fs.inotify.max_user_watches: "524288"
 fs.inotify.max_user_instances: "512"
+
 vm.dirty_ratio: "40"
 vm.dirty_background_ratio: "10"
 vm.max_map_count: "262144"
 vm.overcommit_memory: "1"
+
 kernel.pid_max: "4194304"
 kernel.threads-max: "4194304"
-net.ipv4.ip_local_port_range: "1024 65535"
 ```
-
-## Tools for benmark
-```
-perf
-netstat
-ss
-ethtool
-wrk
-```
-
-### Using sysctl for container (containerd or cri-o v2)
-
-
 ## Link perferences:
 ```
 https://garycplin.blogspot.com/2017/06/linux-network-scaling-receives-packets.html
@@ -102,4 +93,14 @@ In rocky linux 9.7, net.core.somaxconn set default `4096` and net.ipv4.tcp_max_s
 In rocky linux 9.7, net.core.netdev_max_backlog set default `1000`
 
 #### 3. net.core.rmem_max & net.core.wmem_max & net.core.optmem_max
-`net.core.optmem_max` 
+![max](img/rmem_max_and_wmem_max.jpg)
+`net.core.optmem_max`
+maximum ancillary buffer size allowed per socket. Ancillary data is a sequence
+of struct cmsghdr structures with appended data. <br>
+`net.core.rmem_max` the maximum receive socket buffer size in bytes. <br>
+`net.core.wmem_max` The maximum send socket buffer size in bytes. <br>
+#### 3.1 Before
+In rocky linux 9.7, it setting
+```
+
+```
