@@ -1,4 +1,10 @@
-# All register sysctl using tunning k8s kernel `5.14.0-611.13.1.el9_7.x86_64`
+# All register sysctl using tunning kernel `5.14.0-611.13.1.el9_7.x86_64`
+
+## System Specifications
+
+| Network card | CPU | RAM |
+|--------------|-----|-----|
+| 40GB/s | 4 vcores (2294.686Mhz) | 8GB |
 
 ## All register
 
@@ -14,6 +20,7 @@ net.core.wmem_max: "16777216"
 net.core.rmem_default: "1048576"
 net.core.wmem_default: "1048576"
 net.core.optmem_max: "65535"
+
 net.ipv4.tcp_rmem: "4096 1048576 16777216"
 net.ipv4.tcp_wmem: "4096 1048576 16777216"
 net.ipv4.tcp_slow_start_after_idle: "0"
@@ -94,4 +101,5 @@ In rocky linux 9.7, net.core.somaxconn set default `4096` and net.ipv4.tcp_max_s
 #### 2.1 Before
 In rocky linux 9.7, net.core.netdev_max_backlog set default `1000`
 
-### Setup lab for to prove sysctl working
+#### 3. net.core.rmem_max & net.core.wmem_max & net.core.optmem_max
+`net.core.optmem_max` 
