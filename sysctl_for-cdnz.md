@@ -102,5 +102,21 @@ of struct cmsghdr structures with appended data. <br>
 #### 3.1 Before
 In rocky linux 9.7, it setting
 ```
-
+net.core.optmem_max = 81920
+net.core.rmem_max = 212992
+net.core.wmem_max = 212992
+net.core.rmem_default = 212992
+net.core.wmem_default = 212992
 ```
+
+## link references
+[Using perl tool](https://www.brendangregg.com/perf.html) <br>
+[Measuring Workload Performance with Hardware Performance](https://docs.nvidia.com/dccpu/grace-perf-tuning-guide/measuring-performance.html) <br>
+[Oracle Tunning](https://docs.oracle.com/cd/E18930_01/html/821-2431/abeji.html)
+[Tuinning with LAN 10GbE](https://glenewhittenberg.blogspot.com/2016/03/intel-x520-da2-performance-tuning-for.html) <br>
+[Network tuning - a practical guide](https://indico.cern.ch/event/274974/contributions/620868/attachments/497313/687046/RV_Network_ALICE_WKS_20140307_v0.pdf) <br>
+[rmem.c](https://elixir.bootlin.com/linux/v5.15.78/source/drivers/nvmem/rmem.c) <br>
+[Bandwidth-delay product](https://en.wikipedia.org/wiki/Bandwidth-delay_product) <br>
+[Test/Measurement Host Tuning](https://fasterdata.es.net/host-tuning/linux/test-measurement-host-tuning/) <br>
+[net/sysctl](https://docs.kernel.org/admin-guide/sysctl/net.html) <br>
+[kernel/sysctl](https://origin.kernel.org/doc/html/latest/admin-guide/sysctl/kernel.html) <br>
