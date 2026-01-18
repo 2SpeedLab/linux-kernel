@@ -7,6 +7,25 @@ ethtool
 wrk
 ```
 
+<<<<<<< HEAD
+=======
+## command check current connection network using
+
+```
+ ss -s
+Total: 121
+TCP:   7 (estab 2, closed 0, orphaned 0, timewait 0)
+
+Transport Total     IP        IPv6
+RAW       0         0         0        
+UDP       5         3         2        
+TCP       7         3         4        
+INET      12        6         6        
+FRAG      0         0         0  
+```
+
+
+>>>>>>> tri
 ## Perf
 Apply config sysctl and running command perf testing performance link public server testing perf [iperf](https://iperf.fr/iperf-servers.php) and link command [ref](https://iperf.fr/iperf-doc.php#tuningudp) 
 
@@ -30,6 +49,14 @@ RX Jumbo:       0
 TX:             512
 ```
 
+<<<<<<< HEAD
+=======
+command increase buffer ring network using maxium card support
+```
+ethtool -G eth0 rx 4096 tx 4096
+```
+
+>>>>>>> tri
 check current network server using command cat /proc/softirqs or ps aux | grep ksoftirq if high queue network using command below is will be most suitable
 
 [what is ring buffer?](https://docs.kernel.org/userspace-api/perf_ring_buffer.html)
