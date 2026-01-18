@@ -38,19 +38,17 @@ net.ipv4.tcp_window_scaling: "1"
 net.ipv4.ip_local_port_range: "1024 65535"
 net.ipv4.ip_forward: "1"
 
-net.bridge.bridge-nf-call-iptables: "1"
-net.netfilter.nf_conntrack_max: "1048576"
 fs.file-max: "2097152"
 fs.nr_open: "2097152"
-fs.inotify.max_user_watches: "524288"
-fs.inotify.max_user_instances: "512"
-vm.dirty_ratio: "40"
+
+vm.dirty_ratio: "20"
 vm.dirty_background_ratio: "10"
-vm.max_map_count: "262144"
 vm.overcommit_memory: "1"
+
 kernel.pid_max: "4194304"
 kernel.threads-max: "4194304"
 ```
+
 ## Link perferences:
 ```
 https://garycplin.blogspot.com/2017/06/linux-network-scaling-receives-packets.html
@@ -154,6 +152,75 @@ giving up and killing the connection if no response is obtained from the other e
 
 ```
 Dead connection detected in: 5 min + (30s × 5) = 7.5 minutes
+```
+
+#### 7. TCP performance and scalability tuning strategy
+`net.ipv4.tcp_max_tw_buckets` maximum number of sockets in TIME_WAIT state.
+`net.ipv4.tcp_syncookies: 1` Protection against SYN flood attacks.
+```
+Normal SYN handling:
+Client → SYN → Server stores in SYN queue
+Server → SYN-ACK → waits for ACK
+Memory consumed per half-open connection
+
+SYN flood attack:
+Attacker sends thousands of SYNs without ACKing
+→ SYN queue fills up
+→ Legitimate clients can't connect
+```
+`net.ipv4.tcp_timestamps` adds timestamp option to TCP packets. <br>
+`net.ipv4.tcp_sack` allows receiver to tell sender exactly which packets were received
+```
+With SACK:
+Packets: [1] [2] [3] [4] [5]
+Packet 3 lost
+Client ACKs: "Got 1,2,4,5 - missing 3"
+Server only resends: [3]
+```
+`net.ipv4.tcp_window_scaling` allows TCP window size > 64 KB. <br>
+`net.ipv4.ip_forward` Enables IP packet forwarding (routing between interfaces).
+
+#### 8. Netfilter & Connection tracking
+`fs.file-max` System-wide maximum number of file handles (file descriptors) the kernel will allocate. <br>
+`fs.nr_open` Per-process maximum number of file descriptors a single process can open.
+```
+Limit hierarchy:
+fs.file-max          ← System-wide hard limit (2M)
+    └─> fs.nr_open   ← Per-process ceiling (2M)
+          └─> ulimit -n  ← Per-process soft/hard limit (must be ≤ nr_open)
+```
+
+#### 9. Virtual memory (VM) tuning
+`vm.dirty_background_ratio` memory pages that still need to be written to disk — before the pdflush/flush/kdmflush background processes kick in to write it to disk. My example is 10%, so if my virtual server has 32 GB of memory that’s 3.2 GB of data that can be sitting in RAM before something is done. <br>
+
+`vm.dirty_ratio` is the absolute maximum amount of system memory that can be filled with dirty pages before everything must get committed to disk. When the system gets to this point all new I/O blocks until dirty pages have been written to disk. This is often the source of long I/O pauses, but is a safeguard against too much data being cached unsafely in memory.
+
+```
+┌─────────────────────────────────────────────┐
+│ DIRTY PAGE MANAGEMENT                       │
+├─────────────────────────────────────────────┤
+│                                             │
+│ 0% ───────────────────────────────────────  │ No action
+│                                             │
+│ 10% ← dirty_background_ratio                │ Background flush starts
+│      ├─ Gentle disk writes                  │ (non-blocking)
+│      ├─ Processes continue normally         │
+│      └─ Goal: prevent reaching dirty_ratio  │
+│                                             │
+│ 20% ← dirty_ratio                           │ HARD LIMIT
+│      ├─ Processes BLOCKED on writes         │ (blocking)
+│      ├─ Aggressive flushing                 │
+│      └─ Performance impact                  │
+└─────────────────────────────────────────────┘
+```
+`vm.overcommit_memory: 1` the kernel performs no memory overcommit handling. This increases the possibility of memory overload, but improves performance for memory-intensive tasks.
+
+#### 10. Process & thread limits
+`kernel.pid_max` the maximum numerical PROCESS IDENTIFIER than can be assigned by the kernel. <br>
+`kernel.threads-max` system-wide maximum number of threads (tasks).
+```
+Formula: max_threads = total_RAM_KB / 8
+Example: 8 GB RAM = (8 × 1024 × 1024) / 8 = 1,048,576 (1M threads)
 ```
 
 ## Note:
