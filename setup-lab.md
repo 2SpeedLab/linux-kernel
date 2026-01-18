@@ -7,8 +7,6 @@ ethtool
 wrk
 ```
 
-<<<<<<< HEAD
-=======
 ## command check current connection network using
 
 ```
@@ -25,7 +23,6 @@ FRAG      0         0         0
 ```
 
 
->>>>>>> tri
 ## Perf
 Apply config sysctl and running command perf testing performance link public server testing perf [iperf](https://iperf.fr/iperf-servers.php) and link command [ref](https://iperf.fr/iperf-doc.php#tuningudp) 
 
