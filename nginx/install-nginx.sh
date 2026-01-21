@@ -365,7 +365,7 @@ Wants=network-online.target
 
 [Service]
 Type=forking
-PIDFile=/var/run/nginx.pid
+PIDFile=run/nginx.pid
 ExecStartPre=/usr/sbin/nginx -t -q
 ExecStart=/usr/sbin/nginx
 ExecReload=/bin/sh -c "/bin/kill -s HUP $(/bin/cat /var/run/nginx.pid)"
