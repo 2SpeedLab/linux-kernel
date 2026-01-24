@@ -1,6 +1,6 @@
 [cen](https://indico.cern.ch/event/274974/contributions/620868/attachments/497313/687046/RV_Network_ALICE_WKS_20140307_v0.pdf)
 
-[ LVS: Performance and Kernel Tuning](https://docs.huihoo.com/hpc-cluster/linux-virtual-server/HOWTO/LVS-HOWTO.performance.html)
+[LVS: Performance and Kernel Tuning](https://docs.huihoo.com/hpc-cluster/linux-virtual-server/HOWTO/LVS-HOWTO.performance.html)
 
 [network](https://www.opensourceforu.com/2016/10/network-performance-monitoring/)
 
@@ -79,7 +79,7 @@ https://cherusk.github.io/monitoring-and-tuning-the-linux-networking-stack-egres
 
 search
 
-###Low latency network tuning
+### Low latency network tuning
 ```
 IRQ Processing
 The irqbalance daemon is a system utility that optimizes CPU usage by balancing interrupt loads across multiple CPUs. It identifies the most active interrupt sources and assigns them to a single unique CPU, thereby spreading the workload and minimizing cache rate misses for interrupt handlers. This helps to balance CPU load and improve overall system performance.
@@ -87,12 +87,12 @@ The irqbalance daemon is a system utility that optimizes CPU usage by balancing 
 To run irqbalance, use the irqbalance --oneshot command with the --debug3 flag if necessary.
 ```
 
-###TCP max tw buckets
+### TCP max tw buckets
 ```
 The kernel parameter controls the maximum number of TCP time-wait (tw) buckets allowed in the system. A tw bucket is used to store information about a closed TCP connection. If the number of tw buckets exceeds this limit, the system will start dropping new incoming connections. This parameter helps prevent a Denial of Service (DoS) attack by limiting the number of tw buckets. The default value is 262144.
 ```
 
-###TCP Congestion Control
+### TCP Congestion Control
 ```
 Congestion control is the TCP protocol's method of managing data flow over a network and preventing congestion - queuing delay, packet loss or blocking new connections.
 

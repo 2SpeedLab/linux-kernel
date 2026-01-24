@@ -1,4 +1,10 @@
-#result test 10gb without idle=0
+# Compute resource
+
+|CPU|RAM|
+|---|---|
+|4|8|
+
+# result test 10gb without idle=0
 ```
 Test Complete. Summary Results:
 [ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
@@ -31,7 +37,7 @@ iperf 3.9
 Linux rocky--1 5.14.0-611.13.1.el9_7.x86_64 #1 SMP PREEMPT_DYNAMIC Fri Dec 12 11:55:11 UTC 2025 x86_64
 ```
 
-#Result test with idle=0
+# Result test with idle=0
 ```
 Test Complete. Summary Results:
 [ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
@@ -63,3 +69,4 @@ Test Complete. Summary Results:
 iperf 3.9
 Linux rocky--1 5.14.0-611.13.1.el9_7.x86_64 #1 SMP PREEMPT_DYNAMIC Fri Dec 12 11:55:11 UTC 2025 x86_64
 ```
+![idle](img/idle.png)
