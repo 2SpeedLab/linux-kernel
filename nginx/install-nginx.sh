@@ -1,20 +1,4 @@
 #!/bin/bash
-#===============================================================================
-# nginx Build Script for High-Performance CDN Workloads
-#===============================================================================
-# Target: Rocky Linux 9.7 with 40 Gbps network
-# nginx:    1.27.1
-# OpenSSL:  3.5.0 (with KTLS support)
-# PCRE2:    10.44 (with JIT support)
-# zlib:     1.2.12
-#
-# Optimized for sysctl tuning:
-#   - 65535 somaxconn/backlog
-#   - 16MB socket buffers
-#   - 2M+ file descriptors
-#   - High connection concurrency
-#===============================================================================
-
 set -euo pipefail
 
 #-------------------------------------------------------------------------------
@@ -32,14 +16,6 @@ NGINX_GROUP="nginx"
 
 # CPU count for parallel builds
 NPROC=$(nproc)
-
-# Compiler optimization flags for CDN workloads
-# -O3: Aggressive optimization
-# -march=native: CPU-specific optimizations
-# -mtune=native: Tuned for local CPU
-# -fomit-frame-pointer: Free up register
-# -pipe: Use pipes instead of temp files (faster compilation)
-# -fstack-protector-strong: Security without major overhead
 export CFLAGS="-O3 -march=native -mtune=native -fomit-frame-pointer -pipe -fstack-protector-strong"
 export CXXFLAGS="${CFLAGS}"
 export LDFLAGS="-Wl,-O1 -Wl,--as-needed -Wl,-z,relro -Wl,-z,now"
@@ -58,9 +34,6 @@ log_ok()    { echo -e "${GREEN}[OK]${NC} $1"; }
 log_warn()  { echo -e "${YELLOW}[WARN]${NC} $1"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
-#-------------------------------------------------------------------------------
-# Preflight checks
-#-------------------------------------------------------------------------------
 preflight_checks() {
     log_info "Running preflight checks..."
 
@@ -87,9 +60,6 @@ preflight_checks() {
     log_ok "Preflight checks passed"
 }
 
-#-------------------------------------------------------------------------------
-# Install build dependencies
-#-------------------------------------------------------------------------------
 install_dependencies() {
     log_info "Installing build dependencies..."
 
@@ -108,9 +78,6 @@ install_dependencies() {
     log_ok "Build dependencies installed"
 }
 
-#-------------------------------------------------------------------------------
-# Create nginx user
-#-------------------------------------------------------------------------------
 create_nginx_user() {
     log_info "Creating nginx user..."
 
@@ -122,9 +89,6 @@ create_nginx_user() {
     fi
 }
 
-#-------------------------------------------------------------------------------
-# Prepare build directory
-#-------------------------------------------------------------------------------
 prepare_build_dir() {
     log_info "Preparing build directory: ${BUILD_DIR}"
 
@@ -135,9 +99,6 @@ prepare_build_dir() {
     log_ok "Build directory ready"
 }
 
-#-------------------------------------------------------------------------------
-# Download and verify sources
-#-------------------------------------------------------------------------------
 download_sources() {
     log_info "Downloading source packages..."
 
@@ -166,9 +127,6 @@ download_sources() {
     log_ok "All sources downloaded and extracted"
 }
 
-#-------------------------------------------------------------------------------
-# Build zlib
-#-------------------------------------------------------------------------------
 build_zlib() {
     log_info "Building zlib ${ZLIB_VERSION}..."
 
@@ -184,9 +142,6 @@ build_zlib() {
     log_ok "zlib built successfully"
 }
 
-#-------------------------------------------------------------------------------
-# Build PCRE2 with JIT
-#-------------------------------------------------------------------------------
 build_pcre2() {
     log_info "Building PCRE2 ${PCRE2_VERSION} with JIT support..."
 
@@ -207,9 +162,6 @@ build_pcre2() {
     log_ok "PCRE2 built with JIT support"
 }
 
-#-------------------------------------------------------------------------------
-# Build OpenSSL with KTLS
-#-------------------------------------------------------------------------------
 build_openssl() {
     log_info "Building OpenSSL ${OPENSSL_VERSION} with KTLS support..."
 
@@ -243,22 +195,10 @@ build_openssl() {
     log_ok "OpenSSL built with KTLS support"
 }
 
-#-------------------------------------------------------------------------------
-# Build nginx
-#-------------------------------------------------------------------------------
 build_nginx() {
     log_info "Building nginx ${NGINX_VERSION}..."
 
     cd "${BUILD_DIR}/nginx-${NGINX_VERSION}"
-
-    # nginx configuration optimized for CDN workloads
-    # Modules selected for:
-    #   - High concurrency (event-driven)
-    #   - Static content delivery
-    #   - SSL/TLS termination with KTLS
-    #   - Compression
-    #   - Caching
-    #   - Load balancing
 
     ./configure \
         --prefix=${INSTALL_PREFIX} \
@@ -314,23 +254,15 @@ build_nginx() {
     log_ok "nginx built successfully"
 }
 
-#-------------------------------------------------------------------------------
-# Post-installation setup
-#-------------------------------------------------------------------------------
 post_install() {
     log_info "Running post-installation setup..."
-
-    # Create required directories
     mkdir -p /var/cache/nginx/{client_temp,proxy_temp,fastcgi_temp,uwsgi_temp,scgi_temp}
     mkdir -p /var/log/nginx
     mkdir -p ${INSTALL_PREFIX}/conf.d
     mkdir -p ${INSTALL_PREFIX}/ssl
-
-    # Set permissions
     chown -R ${NGINX_USER}:${NGINX_GROUP} /var/cache/nginx
     chown -R ${NGINX_USER}:${NGINX_GROUP} /var/log/nginx
 
-    # Create log rotation
     cat > /etc/logrotate.d/nginx << 'EOF'
 /var/log/nginx/*.log {
     daily
@@ -350,9 +282,6 @@ EOF
     log_ok "Post-installation setup complete"
 }
 
-#-------------------------------------------------------------------------------
-# Create systemd service
-#-------------------------------------------------------------------------------
 create_systemd_service() {
     log_info "Creating systemd service..."
 
@@ -398,9 +327,6 @@ EOF
     log_ok "Systemd service created and enabled"
 }
 
-#-------------------------------------------------------------------------------
-# Enable KTLS kernel module
-#-------------------------------------------------------------------------------
 enable_ktls() {
     log_info "Configuring KTLS kernel module..."
 
@@ -413,9 +339,6 @@ enable_ktls() {
     log_ok "KTLS configuration complete"
 }
 
-#-------------------------------------------------------------------------------
-# Verify installation
-#-------------------------------------------------------------------------------
 verify_installation() {
     log_info "Verifying installation..."
 
@@ -464,50 +387,6 @@ verify_installation() {
     log_ok "Installation verification complete"
 }
 
-#-------------------------------------------------------------------------------
-# Display summary
-#-------------------------------------------------------------------------------
-display_summary() {
-    cat << EOF
-
-================================================================================
-                    nginx Build Complete
-================================================================================
-
-Installed Components:
-  nginx:    ${NGINX_VERSION}
-  OpenSSL:  ${OPENSSL_VERSION} (KTLS enabled)
-  PCRE2:    ${PCRE2_VERSION} (JIT enabled)
-  zlib:     ${ZLIB_VERSION}
-
-Installation Paths:
-  Binary:   /usr/sbin/nginx
-  Config:   ${INSTALL_PREFIX}/nginx.conf
-  Logs:     /var/log/nginx/
-  Cache:    /var/cache/nginx/
-  Modules:  /usr/lib64/nginx/modules/
-
-Systemd Commands:
-  systemctl start nginx
-  systemctl stop nginx
-  systemctl reload nginx
-  systemctl status nginx
-
-Your sysctl settings are optimized for:
-  - 65,535 max connections in backlog
-  - 16 MB socket buffers (40 Gbps × 2ms RTT = 10MB needed)
-  - 2M+ file descriptors
-  - Aggressive connection reuse
-
-IMPORTANT: Deploy the optimized nginx.conf to leverage your sysctl tuning!
-
-================================================================================
-EOF
-}
-
-#-------------------------------------------------------------------------------
-# Main
-#-------------------------------------------------------------------------------
 main() {
     echo ""
     echo "==============================================================================="
@@ -529,8 +408,5 @@ main() {
     create_systemd_service
     enable_ktls
     verify_installation
-    display_summary
 }
-
-# Run
 main "$@"
